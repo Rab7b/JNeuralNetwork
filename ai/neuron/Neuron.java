@@ -14,10 +14,10 @@ public class Neuron {
         }
         bias = 0;
     }
-    public double activate(double x){
+    private static double activate(double x){
         return Math.max(0.01*x, x);
     }
-    public double derivative(double x){
+    private static double derivative(double x){
         return x > 0 ? 1 : 0.01;
     }
     public double predict() {
