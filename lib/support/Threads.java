@@ -1,4 +1,4 @@
-package support;
+package lib.support;
 import java.lang.Thread;
 import java.util.function.*;
 

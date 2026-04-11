@@ -1,4 +1,4 @@
-package ai.neuron;
+package lib.ai.neuron;
 
 public class Neuron {
     private double[] weights, inputs;
@@ -43,5 +43,8 @@ public class Neuron {
             weights[i] += lr * error * inputs[i] * derivative(output);
         }
         bias += lr * error * derivative(output);
+    }
+    public void setInputs(double[] inputs) {
+        this.inputs = inputs;
     }
 }
