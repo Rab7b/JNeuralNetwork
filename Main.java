@@ -1,9 +1,7 @@
 import lib.ai.network.*;
-import lib.support.*;
 
 public class Main {
     public static void main(String[] args) {
-        MultiTask mainThread = new MultiTask();
         Network network = new Network(1, 2, null, 0.01);
         double[][] inputs = {
                 { 0, 0 },
@@ -12,14 +10,17 @@ public class Main {
                 { 1, 1 }
         };
         double[] targets = { 0, 1, 1, 1 };
+
+        network.addLayer(10, 2, inputs[0], 0.01);
+        network.addLayer(10, 2, inputs[1], 0.01);
+        network.addLayer(10, 2, inputs[2], 0.01);
+        network.addLayer(10, 2, inputs[3], 0.01);
+
         for (int epoch = 0; epoch < 10000; epoch++) {
             for (int i = 0; i < inputs.length; i++) {
                 final int index = i;
                 network.setInputs(inputs[i]);
-                mainThread.doIt(x -> {
-                    network.train(targets[index]);
-                    return null;
-                });
+                network.train(targets[index]);
             }
         }
         for (int i = 0; i < inputs.length; i++) {
