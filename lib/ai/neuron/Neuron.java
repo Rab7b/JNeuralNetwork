@@ -33,7 +33,7 @@ public class Neuron {
         return lastOutput;
     }
 
-    public void train(double target) {
+    public synchronized void train(double target) {
         double output = predict();
         double error = target - output;
         double delta = error * derivative(output);
@@ -43,7 +43,7 @@ public class Neuron {
         bias += lr * delta;
     }
 
-    public void qlearn(double reward, double next, double gamma) {
+    public synchronized void qlearn(double reward, double next, double gamma) {
         double output = predict();
         double target = reward + gamma * next;
         double error = target - output;

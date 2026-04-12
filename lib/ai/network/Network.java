@@ -38,17 +38,8 @@ public class Network {
         return best;
     }
 
-    public void train(double target) {
-        for (Neuron[] layer : layers) {
-            for (Neuron n : layer) {
-                n.train(target);
-            }
-        }
-    }
-
-    public void trainLayers(double target) {
-
-        double[] currentInput = layers.get(0)[0].getInputs();
+    public synchronized void trainLayers(double[] initialInputs, double target) {
+        double[] currentInput = initialInputs;
         for (int i = 0; i < layers.size(); i++) {
             Neuron[] layer = layers.get(i);
             double[] outputs = new double[layer.length];
@@ -93,14 +84,6 @@ public class Network {
         }
     }
 
-    public void qlearn(double reward, double next, double gamma) {
-        for (Neuron[] layer : layers) {
-            for (Neuron n : layer) {
-                n.qlearn(reward, next, gamma);
-            }
-        }
-    }
-
     public void addLayer(int neuronCount, int inputSize, double[] inputs, double lr) {
         Neuron[] newLayer = new Neuron[neuronCount];
         for (int i = 0; i < neuronCount; i++) {
@@ -110,11 +93,7 @@ public class Network {
     }
 
     public void setInputs(double[] inputs) {
-        setInputsToLayer(0, inputs);
-    }
-
-    private void setInputsToLayer(int layerIdx, double[] inputs) {
-        for (Neuron n : layers.get(layerIdx)) {
+        for (Neuron n : layers.get(0)) {
             n.setInputs(inputs);
         }
     }
