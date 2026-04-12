@@ -1,21 +1,36 @@
 package lib.ai.network;
 
 import lib.ai.neuron.Neuron;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Network {
-    private Neuron[] neurons;
+    private List<Neuron[]> layers;
+    private double lr;
 
     public Network(int neuronCount, int inputSize, double[] inputs, double lr) {
-        neurons = new Neuron[neuronCount];
+        this.layers = new ArrayList<>();
+        this.lr = lr;
+        Neuron[] firstLayer = new Neuron[neuronCount];
         for (int i = 0; i < neuronCount; i++) {
-            neurons[i] = new Neuron(inputSize, inputs, lr);
+            firstLayer[i] = new Neuron(inputSize, inputs, lr);
         }
+        layers.add(firstLayer);
     }
 
     public double predict(double target) {
-        double best = 0.0;
-        for (int i = 0; i < neurons.length; i++) {
-            double output = neurons[i].predict();
+        double[] currentInputs = layers.get(0)[0].getInputs();
+        for (Neuron[] layer : layers) {
+            double[] nextInputs = new double[layer.length];
+            for (int i = 0; i < layer.length; i++) {
+                layer[i].setInputs(currentInputs);
+                nextInputs[i] = layer[i].predict();
+            }
+            currentInputs = nextInputs;
+        }
+
+        double best = currentInputs[0];
+        for (double output : currentInputs) {
             if (Math.abs(output - target) < Math.abs(best - target)) {
                 best = output;
             }
@@ -24,31 +39,83 @@ public class Network {
     }
 
     public void train(double target) {
-        for (int i = 0; i < neurons.length; i++) {
-            neurons[i].train(target);
+        for (Neuron[] layer : layers) {
+            for (Neuron n : layer) {
+                n.train(target);
+            }
+        }
+    }
+
+    public void trainLayers(double target) {
+
+        double[] currentInput = layers.get(0)[0].getInputs();
+        for (int i = 0; i < layers.size(); i++) {
+            Neuron[] layer = layers.get(i);
+            double[] outputs = new double[layer.length];
+            for (int j = 0; j < layer.length; j++) {
+                layer[j].setInputs(currentInput);
+                outputs[j] = layer[j].predict();
+            }
+            currentInput = outputs;
+        }
+
+        double[] nextLayerDeltas = null;
+
+        for (int i = layers.size() - 1; i >= 0; i--) {
+            Neuron[] currentLayer = layers.get(i);
+            double[] currentDeltas = new double[currentLayer.length];
+
+            for (int j = 0; j < currentLayer.length; j++) {
+                double output = currentLayer[j].getLastOutput();
+                double derivative = output * (1.0 - output);
+                double error = 0;
+
+                if (i == layers.size() - 1) {
+                    error = target - output;
+                } else {
+                    Neuron[] nextLayer = layers.get(i + 1);
+                    for (int k = 0; k < nextLayer.length; k++) {
+                        error += nextLayerDeltas[k] * nextLayer[k].getWeights()[j];
+                    }
+                }
+
+                double delta = error * derivative;
+                currentDeltas[j] = delta;
+
+                double[] w = currentLayer[j].getWeights();
+                double[] in = currentLayer[j].getInputs();
+                for (int k = 0; k < w.length; k++) {
+                    w[k] += lr * delta * in[k];
+                }
+                currentLayer[j].setBias(currentLayer[j].getBias() + lr * delta);
+            }
+            nextLayerDeltas = currentDeltas;
         }
     }
 
     public void qlearn(double reward, double next, double gamma) {
-        for (int i = 0; i < neurons.length; i++) {
-            neurons[i].qlearn(reward, next, gamma);
+        for (Neuron[] layer : layers) {
+            for (Neuron n : layer) {
+                n.qlearn(reward, next, gamma);
+            }
         }
     }
 
     public void addLayer(int neuronCount, int inputSize, double[] inputs, double lr) {
-        Neuron[] newNeurons = new Neuron[neurons.length + neuronCount];
-        for (int i = 0; i < neurons.length; i++) {
-            newNeurons[i] = neurons[i];
+        Neuron[] newLayer = new Neuron[neuronCount];
+        for (int i = 0; i < neuronCount; i++) {
+            newLayer[i] = new Neuron(inputSize, inputs, lr);
         }
-        for (int i = neurons.length; i < newNeurons.length; i++) {
-            newNeurons[i] = new Neuron(inputSize, inputs, lr);
-        }
-        neurons = newNeurons;
+        layers.add(newLayer);
     }
 
     public void setInputs(double[] inputs) {
-        for (int i = 0; i < neurons.length; i++) {
-            neurons[i].setInputs(inputs);
+        setInputsToLayer(0, inputs);
+    }
+
+    private void setInputsToLayer(int layerIdx, double[] inputs) {
+        for (Neuron n : layers.get(layerIdx)) {
+            n.setInputs(inputs);
         }
     }
 }
