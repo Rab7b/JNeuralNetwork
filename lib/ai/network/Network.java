@@ -1,15 +1,18 @@
 package lib.ai.network;
+
 import lib.ai.neuron.Neuron;
 
-public class Network{
+public class Network {
     private Neuron[] neurons;
+
     public Network(int neuronCount, int inputSize, double[] inputs, double lr) {
         neurons = new Neuron[neuronCount];
         for (int i = 0; i < neuronCount; i++) {
             neurons[i] = new Neuron(inputSize, inputs, lr);
         }
     }
-    public double predict(double target){
+
+    public double predict(double target) {
         double best = 0.0;
         for (int i = 0; i < neurons.length; i++) {
             double output = neurons[i].predict();
@@ -19,16 +22,19 @@ public class Network{
         }
         return best;
     }
+
     public void train(double target) {
         for (int i = 0; i < neurons.length; i++) {
             neurons[i].train(target);
         }
     }
+
     public void qlearn(double reward, double next, double gamma) {
         for (int i = 0; i < neurons.length; i++) {
             neurons[i].qlearn(reward, next, gamma);
         }
     }
+
     public void addLayer(int neuronCount, int inputSize, double[] inputs, double lr) {
         Neuron[] newNeurons = new Neuron[neurons.length + neuronCount];
         for (int i = 0; i < neurons.length; i++) {
@@ -39,6 +45,7 @@ public class Network{
         }
         neurons = newNeurons;
     }
+
     public void setInputs(double[] inputs) {
         for (int i = 0; i < neurons.length; i++) {
             neurons[i].setInputs(inputs);

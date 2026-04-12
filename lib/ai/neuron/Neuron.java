@@ -4,6 +4,7 @@ public class Neuron {
     private double[] weights, inputs;
     private double bias;
     private double lr;
+
     public Neuron(int inputSize, double[] in, double lr) {
         this.lr = lr;
         weights = new double[inputSize];
@@ -14,12 +15,15 @@ public class Neuron {
         }
         bias = 0;
     }
-    private static double activate(double x){
-        return Math.max(0.01*x, x);
+
+    private static double activate(double x) {
+        return Math.max(0.01 * x, x);
     }
-    private static double derivative(double x){
+
+    private static double derivative(double x) {
         return x > 0 ? 1 : 0.01;
     }
+
     public double predict() {
         double sum = bias;
         for (int i = 0; i < weights.length; i++) {
@@ -27,6 +31,7 @@ public class Neuron {
         }
         return activate(sum);
     }
+
     public void train(double target) {
         double output = predict();
         double error = target - output;
@@ -35,6 +40,7 @@ public class Neuron {
         }
         bias += lr * error * derivative(output);
     }
+
     public void qlearn(double reward, double next, double gamma) {
         double output = predict();
         double target = reward + gamma * next;
@@ -44,6 +50,7 @@ public class Neuron {
         }
         bias += lr * error * derivative(output);
     }
+
     public void setInputs(double[] inputs) {
         this.inputs = inputs;
     }
