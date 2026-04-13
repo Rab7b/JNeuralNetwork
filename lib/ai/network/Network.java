@@ -97,4 +97,31 @@ public class Network {
             n.setInputs(inputs);
         }
     }
+
+    public double[] getWeight() {
+        List<Double> allWeights = new ArrayList<>();
+
+        for (Neuron[] layer : layers) {
+            for (Neuron n : layer) {
+                for (double w : n.getWeights()) {
+                    allWeights.add(w);
+                }
+            }
+        }
+        return allWeights.stream().mapToDouble(Double::doubleValue).toArray();
+    }
+
+    public void setWeight(double[] flatWeights) {
+        int i = 0;
+        for (Neuron[] layer : layers) {
+            for (Neuron n : layer) {
+                int length = n.getWeights().length;
+                double[] neuronWeights = new double[length];
+                for (int j = 0; j < length; j++) {
+                    neuronWeights[j] = flatWeights[i++];
+                }
+                n.setWeights(neuronWeights);
+            }
+        }
+    }
 }

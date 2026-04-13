@@ -66,6 +66,10 @@ public class Neuron {
         return weights;
     }
 
+    public void setWeights(double[] weights){
+        this.weights = weights;
+    }
+
     public double getBias() {
         return bias;
     }
