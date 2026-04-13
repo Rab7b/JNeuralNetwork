@@ -124,4 +124,32 @@ public class Network {
             }
         }
     }
+
+    public double[] predictFuture(double[] startingInput, int steps) {
+        
+        double[] currentInput = startingInput;
+        double[] futurePredictions = new double[steps];
+
+        for (int i = 0; i < steps; i++) {
+
+            this.setInputs(currentInput);
+
+            double nextValue = this.predict(0); 
+
+            futurePredictions[i] = nextValue;
+
+            currentInput = shiftInput(currentInput, nextValue);
+        }
+
+        return futurePredictions;
+    }
+
+    private double[] shiftInput(double[] oldInput, double nextVal) {
+        double[] newInput = new double[oldInput.length];
+        for (int i = 0; i < oldInput.length - 1; i++) {
+            newInput[i] = oldInput[i + 1];
+        }
+        newInput[newInput.length - 1] = nextVal;
+        return newInput;
+    }
 }

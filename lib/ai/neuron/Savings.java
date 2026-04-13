@@ -12,19 +12,6 @@ public class Savings {
         this.mainFile = mainPath;
     }
 
-    private void writeToFile(double[][][] content, Path path) throws Exception {
-        try (BufferedWriter writer = Files.newBufferedWriter(path)) {
-            for (double[][] layer : content) {
-                for (double[] neuron : layer) {
-                    for (double val : neuron) {
-                        writer.write(Double.toString(val));
-                        writer.newLine();
-                    }
-                }
-            }
-        }
-    }
-
     public void saveMain(double[] content) throws Exception {
         Path path = Path.of(mainFile);
         try (BufferedWriter writer = Files.newBufferedWriter(path)) {

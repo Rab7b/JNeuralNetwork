@@ -1,7 +1,7 @@
 import lib.ai.network.*;
 import lib.ai.neuron.Savings;
 import lib.support.*;
-import java.io.File; 
+import java.io.File;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -26,19 +26,32 @@ public class Main {
             System.out.println("No weights file found. Starting training from scratch...");
         }
 
-        double[][] inputs = {
-                { 0, 0 },
-                { 0, 1 },
-                { 1, 0 },
-                { 1, 1 }
-        };
-        double[] targets = { 0, 1, 1, 0 };
+        int size = 10;
+        int combinations = (int) Math.pow(2, size);
+
+        double[][] inputs = new double[combinations][size];
+        double[] targets = new double[combinations];
+
+        for (int i = 0; i < combinations; i++) {
+            int onesCount = 0;
+            for (int j = 0; j < size; j++) {
+
+                inputs[i][j] = (i >> (size - 1 - j)) & 1;
+
+                if (inputs[i][j] == 1.0) {
+                    onesCount++;
+                }
+            }
+
+            targets[i] = (onesCount % 2 != 0) ? 1.0 : 0.0;
+        }
 
         System.out.println("Training started...");
-        for (int epoch = 0; epoch < 10000000; epoch++) {
+        for (int epoch = 0; epoch < 10000; epoch++) {
             for (int i = 0; i < inputs.length; i++) {
                 final int index = i;
                 network.setInputs(inputs[index]);
+                network.predictFuture(inputs[index], 10);
                 task.doIt((progress) -> {
                     network.trainLayers(inputs[index], targets[index]);
                     return null;
