@@ -1,6 +1,7 @@
 import lib.ai.network.*;
 import lib.ai.neuron.Savings;
 import lib.support.*;
+import lib.support.activations.*;
 import java.io.File;
 
 public class Main {
@@ -8,9 +9,13 @@ public class Main {
 
         MultiTask task = new MultiTask();
 
-        Network network = new Network(4, 2, new double[] { 0, 0 }, 0.1);
-        network.addLayer(2, 2, new double[] { 0, 0 }, 0.1);
-        network.addLayer(2, 2, new double[] { 0, 0 }, 0.1);
+        int size = 2;
+
+        Sigmoid si = new Sigmoid();
+
+        Network network = new Network(4, size, new double[] { 0, 0 }, 0.01, si);
+        network.addLayer(2, 2, new double[] { 0, 0 }, 0.01, si);
+        network.addLayer(2, 2, new double[] { 0, 0 }, 0.01, si);
 
         Savings saver = new Savings("weights.txt");
         File weightFile = new File("weights.txt");
@@ -26,7 +31,6 @@ public class Main {
             System.out.println("No weights file found. Starting training from scratch...");
         }
 
-        int size = 10;
         int combinations = (int) Math.pow(2, size);
 
         double[][] inputs = new double[combinations][size];
@@ -47,7 +51,7 @@ public class Main {
         }
 
         System.out.println("Training started...");
-        for (int epoch = 0; epoch < 10000; epoch++) {
+        for (int epoch = 0; epoch < 1000000; epoch++) {
             for (int i = 0; i < inputs.length; i++) {
                 final int index = i;
                 network.setInputs(inputs[index]);

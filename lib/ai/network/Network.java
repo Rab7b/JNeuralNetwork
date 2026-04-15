@@ -1,5 +1,6 @@
 package lib.ai.network;
 
+import lib.support.*;
 import lib.ai.neuron.Neuron;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,12 +9,12 @@ public class Network {
     private List<Neuron[]> layers;
     private double lr;
 
-    public Network(int neuronCount, int inputSize, double[] inputs, double lr) {
+    public Network(int neuronCount, int inputSize, double[] inputs, double lr, Activation a) {
         this.layers = new ArrayList<>();
         this.lr = lr;
         Neuron[] firstLayer = new Neuron[neuronCount];
         for (int i = 0; i < neuronCount; i++) {
-            firstLayer[i] = new Neuron(inputSize, inputs, lr);
+            firstLayer[i] = new Neuron(inputSize, inputs, lr, a);
         }
         layers.add(firstLayer);
     }
@@ -84,10 +85,10 @@ public class Network {
         }
     }
 
-    public void addLayer(int neuronCount, int inputSize, double[] inputs, double lr) {
+    public void addLayer(int neuronCount, int inputSize, double[] inputs, double lr, Activation a) {
         Neuron[] newLayer = new Neuron[neuronCount];
         for (int i = 0; i < neuronCount; i++) {
-            newLayer[i] = new Neuron(inputSize, inputs, lr);
+            newLayer[i] = new Neuron(inputSize, inputs, lr, a);
         }
         layers.add(newLayer);
     }
