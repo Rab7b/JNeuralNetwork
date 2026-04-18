@@ -1,24 +1,31 @@
 package lib.support;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.DoubleFunction;
 
 public class MultiTask {
 
     private static final int CORES = Runtime.getRuntime().availableProcessors();
+    private final AtomicInteger usingCores = new AtomicInteger(0);
 
-    private static final AtomicInteger usingCores = new AtomicInteger(0);
+    private final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<>(CORES * 2);
+    
+    private final ExecutorService executor;
 
-    private final ExecutorService executor = Executors.newFixedThreadPool(CORES);
+    public MultiTask() {
+        this.executor = new ThreadPoolExecutor(
+            CORES, 
+            CORES, 
+            0L, TimeUnit.MILLISECONDS,
+            queue,
+            new ThreadPoolExecutor.CallerRunsPolicy() 
+        );
+    }
 
     public void doIt(DoubleFunction<?> func) {
-
         executor.submit(() -> {
             int current = usingCores.incrementAndGet();
-
             double progress = (double) current / CORES;
 
             func.apply(progress);
