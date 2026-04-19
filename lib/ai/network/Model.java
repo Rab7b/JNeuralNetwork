@@ -98,7 +98,6 @@ public class Model {
             errors[i] = output[i] - targets[i];
         }
 
-        // Идем назад по слоям
         for (int i = weights.size() - 1; i >= 0; i--) {
             double[][] layer = weights.get(i);
             double[] prevActivations = lastActivations.get(i);
@@ -106,11 +105,16 @@ public class Model {
             double[] nextErrors = new double[prevActivations.length];
 
             for (int r = 0; r < layer.length; r++) {
-
                 double gradient = errors[r];
+
                 if (i < weights.size() - 1) {
                     gradient *= currentActivations[r] * (1.0 - currentActivations[r]);
                 }
+
+                if (gradient > 5)
+                    gradient = 5;
+                if (gradient < -5)
+                    gradient = -5;
 
                 for (int c = 0; c < layer[r].length; c++) {
                     nextErrors[c] += gradient * layer[r][c];
@@ -118,7 +122,6 @@ public class Model {
                 }
             }
 
-    
             if (i > 0) {
                 double[] errorsForNext = new double[nextErrors.length - 1];
                 System.arraycopy(nextErrors, 0, errorsForNext, 0, errorsForNext.length);
