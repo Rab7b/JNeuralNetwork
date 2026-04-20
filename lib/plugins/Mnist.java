@@ -51,7 +51,7 @@ public class Mnist {
 
         System.out.println("Starting training with random sampling...");
 
-        for (int epoch = 0; epoch < 16; epoch++) {
+        for (int epoch = 0; epoch < 15; epoch++) {
 
             System.out.println("Epoch: " + (epoch+1));
 
