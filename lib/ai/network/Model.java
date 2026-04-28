@@ -91,41 +91,40 @@ public class Model {
     }
 
     public synchronized void train(double[] inputs, double[] targets) {
+
         double[] output = predict(inputs);
 
         double[] errors = new double[output.length];
         for (int i = 0; i < output.length; i++) {
-            errors[i] = output[i] - targets[i];
+            errors[i] = (output[i] - targets[i]);
         }
 
         for (int i = weights.size() - 1; i >= 0; i--) {
             double[][] layer = weights.get(i);
             double[] prevActivations = lastActivations.get(i);
-            double[] currentActivations = lastActivations.get(i + 1);
             double[] nextErrors = new double[prevActivations.length];
 
             for (int r = 0; r < layer.length; r++) {
                 double gradient = errors[r];
 
-                if (i < weights.size() - 1) {
-                    gradient *= currentActivations[r] * (1.0 - currentActivations[r]);
-                }
-
-                if (gradient > 5)
-                    gradient = 5;
-                if (gradient < -5)
-                    gradient = -5;
+                if (gradient > 1.0)
+                    gradient = 1.0;
+                if (gradient < -1.0)
+                    gradient = -1.0;
 
                 for (int c = 0; c < layer[r].length; c++) {
+
                     nextErrors[c] += gradient * layer[r][c];
+
                     layer[r][c] -= lr * gradient * prevActivations[c];
                 }
             }
 
             if (i > 0) {
-                double[] errorsForNext = new double[nextErrors.length - 1];
-                System.arraycopy(nextErrors, 0, errorsForNext, 0, errorsForNext.length);
-                errors = errorsForNext;
+                errors = new double[prevActivations.length];
+                for (int j = 0; j < errors.length; j++) {
+                    errors[j] = nextErrors[j] * (prevActivations[j] * (1.0 - prevActivations[j]));
+                }
             }
         }
     }

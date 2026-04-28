@@ -1,0 +1,2 @@
+compile javac -cp ".;lib/demo" Main.java
+run java -cp ".;lib/demo" Main

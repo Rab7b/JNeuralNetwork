@@ -13,17 +13,23 @@ public class Mnist {
     private String path = "E:\\MNIST\\MNIST Dataset JPG format\\MNIST - JPG - training\\";
 
     public double[] parse(String path) {
-
         try {
             File file = new File(path);
             if (!file.exists()) {
-                System.out.println("File not found: " + path);
+                System.out.println("Failed");
                 return null;
             }
 
             BufferedImage img = ImageIO.read(file);
-            if (img == null)
+            if (img == null) {
+                System.out.println("Failed");
                 return null;
+            }
+
+            if (img.getWidth() != 28 || img.getHeight() != 28) {
+                System.out.println("Failed");
+                return null;
+            }
 
             double[] inputs = new double[784];
             int n = 0;
@@ -33,11 +39,18 @@ public class Mnist {
                     int rgb = img.getRGB(x, y);
 
                     int r = (rgb >> 16) & 0xFF;
-                    inputs[n++] = r / 255.0;
+                    int g = (rgb >> 8) & 0xFF;
+                    int b = rgb & 0xFF;
+
+                    double gray = (r + g + b) / 3.0;
+
+                    inputs[n++] = gray / 255.0;
                 }
             }
             return inputs;
+
         } catch (Exception e) {
+            System.out.println("Failed");
             return null;
         }
     }
@@ -53,7 +66,7 @@ public class Mnist {
 
         for (int epoch = 0; epoch < 15; epoch++) {
 
-            System.out.println("Epoch: " + (epoch+1));
+            System.out.println("Epoch: " + (epoch + 1));
 
             for (int i = 0; i < iterations; i++) {
                 int digit = random.nextInt(10);
@@ -77,9 +90,10 @@ public class Mnist {
 
                 network.train(inputs, targets);
             }
+            test();
+            saver.saveMain(network.getWeightsFlat());
         }
 
-        saver.saveMain(network.getWeightsFlat());
         System.out.println("Training finished and weights saved.");
     }
 
@@ -101,7 +115,6 @@ public class Mnist {
             File[] images = folder.listFiles();
 
             if (images != null) {
-                System.out.println("Testing digit: " + digit);
                 for (File imgFile : images) {
                     if (!imgFile.getName().toLowerCase().endsWith(".jpg"))
                         continue;
@@ -122,7 +135,7 @@ public class Mnist {
         }
 
         double accuracy = (double) correct / totalImages * 100;
-        System.out.println("Final Test Accuracy: " + accuracy + "%");
+        System.out.printf("Test completed. Accuracy: %.2f%% (%d/%d)\n", accuracy, correct, totalImages);
     }
 
     private int getArgMax(double[] array) {
